@@ -141,7 +141,9 @@ public class DataCiteImportMetadataSourceServiceImpl
             return query;
         }
         //Workaround for encoded slashes.
-        if(query.contains("%252F")) query = query.replace("%252F", "/");
+        if (query.contains("%252F")) {
+            query = query.replace("%252F", "/");
+        }
         if (DoiCheck.isDoi(query)) {
             return query;
         }
