@@ -7,6 +7,18 @@
  */
 package org.dspace.importer.external.datacite;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.concurrent.Callable;
+import javax.el.MethodNotFoundException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
@@ -20,18 +32,6 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
-
-import javax.el.MethodNotFoundException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Implements a data source for querying Datacite
@@ -141,7 +141,9 @@ public class DataCiteImportMetadataSourceServiceImpl
             return query;
         }
         //Workaround for encoded slashes.
-        if(query.contains("%252F")) query = query.replace("%252F", "/");
+        if (query.contains("%252F")) {
+            query = query.replace("%252F", "/");
+        }
         if (DoiCheck.isDoi(query)) {
             return query;
         }

@@ -7,10 +7,10 @@
  */
 package org.dspace.importer.external.datacite;
 
-import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
-
-import javax.annotation.Resource;
 import java.util.Map;
+import javax.annotation.Resource;
+
+import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping}
