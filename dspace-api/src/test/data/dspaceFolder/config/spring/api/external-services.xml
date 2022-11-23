@@ -93,6 +93,7 @@
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
+                <value>none</value>
             </list>
         </property>
     </bean>
