@@ -7,6 +7,16 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.el.MethodNotFoundException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -19,27 +29,10 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.el.MethodNotFoundException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for {@link DataCiteImportMetadataSourceServiceImpl}
@@ -60,7 +53,6 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test.json")) {
-            when(ClientBuilder.newClient()).thenReturn((Client)httpClient);
             String dataCiteRespXmlResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -69,9 +61,10 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
             context.restoreAuthSystemState();
             ArrayList<ImportRecord> collection2match = getRecords();
-            Collection<ImportRecord> recordsImported = dataCiteServiceImpl.getRecords("test query", 0, 2);
-            assertEquals(2, recordsImported.size());
-            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
+            Collection<ImportRecord> recordsImported = dataCiteServiceImpl.getRecords("10.48550/arxiv.2207.04779",
+                    0, -1);
+            assertEquals(1, recordsImported.size());
+            matchRecords(new ArrayList<>(recordsImported), collection2match);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
@@ -81,49 +74,17 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     public void dataCiteImportMetadataGetRecordsCountTest() throws Exception {
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
-        Client httpClient = Mockito.mock(Client.class);
-        WebTarget webTarget = Mockito.mock(WebTarget.class);
-        WebTarget webTarget2 = Mockito.mock(WebTarget.class);
-        Invocation.Builder invocationBuilder = Mockito.mock(Invocation.Builder.class);
-        Response response = Mockito.mock(Response.class);
-        try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test.json")) {
-            String dataCiteRespJsonResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
-
-            when(httpClient.target(ArgumentMatchers.anyString())).thenReturn(webTarget);
-            when(webTarget.queryParam(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(webTarget2);
-            when(webTarget2.request()).thenReturn(invocationBuilder);
-            when(invocationBuilder.get()).thenReturn(response);
-            when(response.readEntity(String.class)).thenReturn(dataCiteRespJsonResp);
-
-            context.restoreAuthSystemState();
-            dataCiteServiceImpl.setWebTarget(webTarget);
-            int tot = dataCiteServiceImpl.getRecordsCount("test query");
-            assertEquals(10, tot);
-        } finally {
-            liveImportClientImpl.setHttpClient(originalHttpClient);
-        }
-    }
-
-    @Test
-    public void dataCiteImportMetadataGetRecordByIdTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-
-        try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-by-id.json")) {
-            String dataCiteRespXmlResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
+        try (InputStream dataciteResp = getClass().getResourceAsStream("dataCite-test.json")) {
+            String dataciteTextResp = IOUtils.toString(dataciteResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
-            CloseableHttpResponse response = mockResponse(dataCiteRespXmlResp, 200, "OK");
+            CloseableHttpResponse response = mockResponse(dataciteTextResp, 200, "OK");
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            ArrayList<ImportRecord> collection2match = getRecords();
-            collection2match.remove(1);
-            ImportRecord recordImported = dataCiteServiceImpl.getRecord("10.26693/jmbs01.02.184");
-            assertNotNull(recordImported);
-            Collection<ImportRecord> recordsImported = Arrays.asList(recordImported);
-            matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
+            int tot = dataCiteServiceImpl.getRecordsCount("10.48550/arxiv.2207.04779");
+            assertEquals(1, tot);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
         }
@@ -152,59 +113,17 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     private ArrayList<ImportRecord> getRecords() {
         ArrayList<ImportRecord> records = new ArrayList<>();
         //define first record
-        List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
+        List<MetadatumDTO> metadatums  = new ArrayList<>();
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
-                "State of Awareness of Freshers’ Groups Chortkiv State"
-                + " Medical College of Prevention of Iodine Deficiency Diseases");
-        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "L.V. Senyuk");
-        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "journal-article");
-        MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016");
-        MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
-                                   "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");
-        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.26693/jmbs01.02.184");
-        MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "2415-3060");
-        MetadatumDTO volume = createMetadatumDTO("oaire", "citation", "volume", "1");
-        MetadatumDTO issue = createMetadatumDTO("oaire", "citation", "issue", "2");
+                "Mathematical Proof Between Generations");
+        MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.48550/arxiv.2207.04779");
 
         metadatums.add(title);
-        metadatums.add(author);
-        metadatums.add(date);
-        metadatums.add(type);
-        metadatums.add(ispartof);
         metadatums.add(doi);
-        metadatums.add(issn);
-        metadatums.add(volume);
-        metadatums.add(issue);
 
-        ImportRecord firstrRecord = new ImportRecord(metadatums);
+        ImportRecord firstRecord = new ImportRecord(metadatums);
 
-        //define second record
-        List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
-        MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
-                "Ischemic Heart Disease and Role of Nurse of Cardiology Department");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "K. І. Kozak");
-        MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "journal-article");
-        MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2016");
-        MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",
-                                     "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu");
-        MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", "doi", "10.26693/jmbs01.02.105");
-        MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2415-3060");
-        MetadatumDTO volume2 = createMetadatumDTO("oaire", "citation", "volume", "1");
-        MetadatumDTO issue2 = createMetadatumDTO("oaire", "citation", "issue", "2");
-
-        metadatums2.add(title2);
-        metadatums2.add(author2);
-        metadatums2.add(date2);
-        metadatums2.add(type2);
-        metadatums2.add(ispartof2);
-        metadatums2.add(doi2);
-        metadatums2.add(issn2);
-        metadatums2.add(volume2);
-        metadatums2.add(issue2);
-
-        ImportRecord secondRecord = new ImportRecord(metadatums2);
-        records.add(firstrRecord);
-        records.add(secondRecord);
+        records.add(firstRecord);
         return records;
     }
 
