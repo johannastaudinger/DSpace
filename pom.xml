@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
@@ -7,7 +8,7 @@
     <version>7.5-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
-   	DSpace open source software is a turnkey institutional repository application.
+        DSpace open source software is a turnkey institutional repository application.
     </description>
     <url>https://github.com/dspace/DSpace</url>
 
@@ -115,7 +116,7 @@
                             </goals>
                             <configuration>
                                 <rules>
-                                    <DependencyConvergence />
+                                    <DependencyConvergence/>
                                 </rules>
                             </configuration>
                         </execution>
@@ -219,10 +220,7 @@
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip unit tests or not -->
                         <skipTests>${skipUnitTests}</skipTests>
-                        <!--
-                        Enable to debug Maven Surefire tests in remote proces
                         <debugForkedProcess>true</debugForkedProcess>
-                        -->
                     </configuration>
                 </plugin>
                 <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
@@ -236,7 +234,7 @@
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
-                         <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
+                        <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
@@ -696,52 +694,114 @@
                                     <fileTemplate>src/main/license/third-party-file-groupByLicense.ftl</fileTemplate>
                                     <!-- License names that should all be merged into the *first* listed name -->
                                     <licenseMerges>
-                                        <licenseMerge>Apache Software License, Version 2.0|Apache Software License, version 2.0|The Apache Software License, Version 2.0|Apache License Version 2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License 2.0|Apache Software License - Version 2.0|Apache 2.0 License|Apache 2.0 license|Apache License V2.0|Apache 2|Apache License|Apache|ASF 2.0|Apache 2.0|Apache License v2|Apache License v2.0|Apache License, 2.0|Apache License, version 2.0|Apache-2.0|The Apache License, Version 2.0</licenseMerge>
+                                        <licenseMerge>Apache Software License, Version 2.0|Apache Software License,
+                                            version 2.0|The Apache Software License, Version 2.0|Apache License Version
+                                            2.0|Apache License, Version 2.0|Apache Public License 2.0|Apache License
+                                            2.0|Apache Software License - Version 2.0|Apache 2.0 License|Apache 2.0
+                                            license|Apache License V2.0|Apache 2|Apache License|Apache|ASF 2.0|Apache
+                                            2.0|Apache License v2|Apache License v2.0|Apache License, 2.0|Apache
+                                            License, version 2.0|Apache-2.0|The Apache License, Version 2.0
+                                        </licenseMerge>
                                         <!-- Ant-contrib is an Apache License -->
-                                        <licenseMerge>Apache Software License, Version 2.0|http://ant-contrib.sourceforge.net/tasks/LICENSE.txt</licenseMerge>
+                                        <licenseMerge>Apache Software License, Version
+                                            2.0|http://ant-contrib.sourceforge.net/tasks/LICENSE.txt
+                                        </licenseMerge>
                                         <!-- XML Commons claims these licenses, but it's really Apache License: https://xerces.apache.org/xml-commons/licenses.html -->
-                                        <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
+                                        <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C
+                                            License
+                                        </licenseMerge>
                                         <!-- JDOM uses this license, but it's essentially just Apache -->
-                                        <licenseMerge>Apache Software License, Version 2.0|Similar to Apache License but with the acknowledgment clause removed</licenseMerge>
-                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License|The BSD 3-Clause License (BSD3)|BSD License 3</licenseMerge>
+                                        <licenseMerge>Apache Software License, Version 2.0|Similar to Apache License but
+                                            with the acknowledgment clause removed
+                                        </licenseMerge>
+                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style
+                                            license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause
+                                            license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD
+                                            Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License|The BSD
+                                            3-Clause License (BSD3)|BSD License 3
+                                        </licenseMerge>
                                         <!-- DSpace uses a BSD License -->
-                                        <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License</licenseMerge>
+                                        <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License
+                                        </licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
                                         <licenseMerge>BSD License|BSD style modified by Coverity</licenseMerge>
                                         <!-- Jaxen claims this license, but it's really BSD: http://jaxen.codehaus.org/license.html -->
                                         <licenseMerge>BSD License|http://jaxen.codehaus.org/license.html</licenseMerge>
                                         <!-- Java Advanced Imaging Image I/O Tools API core is just a BSD: https://github.com/jai-imageio/jai-imageio-core/blob/master/LICENSE.txt -->
-                                        <licenseMerge>BSD License|BSD 3-clause License w/nuclear disclaimer</licenseMerge>
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|Common Development and Distribution License (CDDL) v1.0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|Common Development and Distribution License|CDDL, v1.0|CDDL 1.0 license|CDDL 1.0|CDDL 1.1|CDDL|Dual license consisting of the CDDL v1.1 and GPL v2</licenseMerge>
+                                        <licenseMerge>BSD License|BSD 3-clause License w/nuclear disclaimer
+                                        </licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|Common
+                                            Development and Distribution License (CDDL) v1.0|COMMON DEVELOPMENT AND
+                                            DISTRIBUTION LICENSE (CDDL) Version 1.0|Common Development and Distribution
+                                            License|CDDL, v1.0|CDDL 1.0 license|CDDL 1.0|CDDL 1.1|CDDL|Dual license
+                                            consisting of the CDDL v1.1 and GPL v2
+                                        </licenseMerge>
                                         <!-- Jersey / Java Servlet API claims this license, but is actually CDDL 1.0: http://servlet-spec.java.net -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|CDDL + GPLv2 with classpath exception</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|CDDL + GPLv2
+                                            with classpath exception
+                                        </licenseMerge>
                                         <!-- Jersey claims this license, but it is dual licensed with CDDL 1.1 being one: https://jersey.java.net/license.html -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|CDDL+GPL License</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|CDDL+GPL
+                                            License
+                                        </licenseMerge>
                                         <!-- JavaMail claims this license, but it is dual licensed with CDDL being one: https://java.net/projects/javamail/pages/License -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|GPLv2+CE|CDDL/GPLv2+CE</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License
+                                            (CDDL)|GPLv2+CE|CDDL/GPLv2+CE
+                                        </licenseMerge>
                                         <!-- JAXB claims this license, but it is dual licensed with CDDL being one: https://jaxb.java.net/ -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|GPL2 w/ CPE</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|GPL2 w/ CPE
+                                        </licenseMerge>
                                         <!-- JBoss Transaction API claims this license, but it is dual licensed with CDDL being one: https://github.com/jboss/jboss-transaction-api_spec -->
-                                        <licenseMerge>Common Development and Distribution License (CDDL)|GNU General Public License, Version 2 with the Classpath Exception</licenseMerge>
-                                        <licenseMerge>Eclipse Distribution License, Version 1.0|Eclipse Distribution License (EDL), Version 1.0|Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
-                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 1.0|EPL 2.0|Eclipse Public License - v 2.0</licenseMerge>
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|GNU General
+                                            Public License, Version 2 with the Classpath Exception
+                                        </licenseMerge>
+                                        <licenseMerge>Eclipse Distribution License, Version 1.0|Eclipse Distribution
+                                            License (EDL), Version 1.0|Eclipse Distribution License - v 1.0|Eclipse
+                                            Distribution License v. 1.0|EDL 1.0
+                                        </licenseMerge>
+                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version
+                                            1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License
+                                            (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License
+                                            v1.0|Eclipse Public License, Version 1.0|EPL 1.0|EPL 2.0|Eclipse Public
+                                            License - v 2.0
+                                        </licenseMerge>
                                         <!-- JUnit claims this license but is actually Eclipse Public License: http://junit.org/license.html -->
-                                        <licenseMerge>Eclipse Public License|Common Public License Version 1.0</licenseMerge>
+                                        <licenseMerge>Eclipse Public License|Common Public License Version 1.0
+                                        </licenseMerge>
                                         <!-- Jersey is dual licensed as EPL but lists its main license as GPL: https://github.com/eclipse-ee4j/jersey#licensing-and-governance -->
-                                        <licenseMerge>Eclipse Public License|The GNU General Public License (GPL), Version 2, With Classpath Exception</licenseMerge>
-                                        <licenseMerge>GNU Lesser General Public License (LGPL)|The GNU Lesser General Public License, Version 2.1|GNU Lesser General Public License (LGPL), Version 2.1|GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1|GNU Lesser General Public License, version 2.1|GNU LESSER GENERAL PUBLIC LICENSE|GNU Lesser General Public License|GNU Lesser Public License|GNU Lesser General Public License, Version 2.1|Lesser General Public License (LGPL) v 2.1|LGPL 2.1|LGPL 2.1 license|LGPL 3.0 license|LGPL, v2.1 or later|LGPL|LGPL, version 2.1|lgpl|Lesser General Public License, version 3 or greater</licenseMerge>
+                                        <licenseMerge>Eclipse Public License|The GNU General Public License (GPL),
+                                            Version 2, With Classpath Exception
+                                        </licenseMerge>
+                                        <licenseMerge>GNU Lesser General Public License (LGPL)|The GNU Lesser General
+                                            Public License, Version 2.1|GNU Lesser General Public License (LGPL),
+                                            Version 2.1|GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1|GNU Lesser
+                                            General Public License, version 2.1|GNU LESSER GENERAL PUBLIC LICENSE|GNU
+                                            Lesser General Public License|GNU Lesser Public License|GNU Lesser General
+                                            Public License, Version 2.1|Lesser General Public License (LGPL) v 2.1|LGPL
+                                            2.1|LGPL 2.1 license|LGPL 3.0 license|LGPL, v2.1 or later|LGPL|LGPL, version
+                                            2.1|lgpl|Lesser General Public License, version 3 or greater
+                                        </licenseMerge>
                                         <!-- Hibernate ORM claims this license, but it's really regular LGPL: https://hibernate.org/community/license/ -->
-                                        <licenseMerge>GNU Lesser General Public License (LGPL)|GNU Library General Public License v2.1 or later</licenseMerge>
-                                        <licenseMerge>MIT License|The MIT License|MIT LICENSE|MIT|MIT license|MIT License (MIT)</licenseMerge>
+                                        <licenseMerge>GNU Lesser General Public License (LGPL)|GNU Library General
+                                            Public License v2.1 or later
+                                        </licenseMerge>
+                                        <licenseMerge>MIT License|The MIT License|MIT LICENSE|MIT|MIT license|MIT
+                                            License (MIT)
+                                        </licenseMerge>
                                         <!-- BouncyCastle uses an MIT-style license: https://www.bouncycastle.org/licence.html -->
                                         <licenseMerge>MIT License|Bouncy Castle Licence</licenseMerge>
                                         <!-- netCDF tools uses an MIT-style license -->
                                         <licenseMerge>MIT License|(MIT-style) netCDF C library license</licenseMerge>
-                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0|Mozilla Public License, Version 2.0</licenseMerge>
+                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla
+                                            Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version
+                                            2.0|Mozilla Public License, Version 2.0
+                                        </licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
                                         <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0|MPL 2.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
-                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems|Public Domain, per Creative Commons CC0</licenseMerge>
+                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems|Public Domain, per
+                                            Creative Commons CC0
+                                        </licenseMerge>
                                         <!-- WTFPL is essentially Public Domain: http://www.wtfpl.net/ ;) -->
                                         <licenseMerge>Public Domain|WTFPL</licenseMerge>
                                     </licenseMerges>
@@ -853,38 +913,38 @@
             </modules>
         </profile>
 
-       <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
-       <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
-       <profile>
-           <id>dspace-rest</id>
-           <activation>
-               <activeByDefault>false</activeByDefault>
-               <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
-               <property>
-                   <name>release</name>
-               </property>
-           </activation>
-           <modules>
-               <module>dspace-rest</module>
-           </modules>
-           <dependencyManagement>
-               <dependencies>
-                   <dependency>
-                       <groupId>org.dspace</groupId>
-                       <artifactId>dspace-rest</artifactId>
-                       <version>7.5-SNAPSHOT</version>
-                       <type>jar</type>
-                       <classifier>classes</classifier>
-                   </dependency>
-                   <dependency>
-                       <groupId>org.dspace</groupId>
-                       <artifactId>dspace-rest</artifactId>
-                       <version>7.5-SNAPSHOT</version>
-                       <type>war</type>
-                   </dependency>
-               </dependencies>
-           </dependencyManagement>
-       </profile>
+        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
+        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
+        <profile>
+            <id>dspace-rest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+            <modules>
+                <module>dspace-rest</module>
+            </modules>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-rest</artifactId>
+                        <version>7.5-SNAPSHOT</version>
+                        <type>jar</type>
+                        <classifier>classes</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-rest</artifactId>
+                        <version>7.5-SNAPSHOT</version>
+                        <type>war</type>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
 
 
         <!--
@@ -921,7 +981,7 @@
         <!--
            Builds Server API webapp for DSpace
         -->
-		<profile>
+        <profile>
             <id>dspace-server-webapp</id>
             <activation>
                 <file>
@@ -1207,7 +1267,7 @@
             </dependency>
 
             <dependency>
-		    <artifactId>spring-jdbc</artifactId>
+                <artifactId>spring-jdbc</artifactId>
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
             </dependency>
@@ -1359,7 +1419,7 @@
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.0</version>
-		<exclusions>
+                <exclusions>
                     <!-- A later version is brought in by google-oauth-client -->
                     <exclusion>
                         <groupId>com.google.code.gson</groupId>
@@ -1639,9 +1699,9 @@
                 <version>4.5.13</version>
             </dependency>
             <dependency>
-              <groupId>org.apache.httpcomponents</groupId>
-              <artifactId>httpmime</artifactId>
-              <version>4.5.13</version>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.13</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1839,7 +1899,7 @@
             <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
-               A BSD 3-Clause license for the DSpace codebase.
+                A BSD 3-Clause license for the DSpace codebase.
             </comments>
         </license>
     </licenses>
@@ -1853,75 +1913,75 @@
         <mailingList>
             <name>DSpace Technical Users List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </unsubscribe>
             <post>dspace-tech AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Developers List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </unsubscribe>
             <post>dspace-devel AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Community List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </unsubscribe>
             <post>dspace-community AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Commit Change-Log</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </unsubscribe>
             <archive>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </archive>
         </mailingList>
     </mailingLists>
 
     <developers>
         <developer>
-           <name>DSpace Committers</name>
-           <email>dspace-devel@googlegroups.com</email>
-           <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
-           <roles>
-             <role>committer</role>
-           </roles>
+            <name>DSpace Committers</name>
+            <email>dspace-devel@googlegroups.com</email>
+            <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
+            <roles>
+                <role>committer</role>
+            </roles>
         </developer>
     </developers>
 
     <contributors>
         <contributor>
-           <name>DSpace Contributors</name>
-           <email>dspace-tech@googlegroups.com</email>
-           <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
-           <roles>
-             <role>developer</role>
-           </roles>
+            <name>DSpace Contributors</name>
+            <email>dspace-tech@googlegroups.com</email>
+            <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
+            <roles>
+                <role>developer</role>
+            </roles>
         </contributor>
     </contributors>
 
