@@ -2,15 +2,17 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.importer.external.datacite;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
@@ -19,19 +21,27 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import net.minidev.json.JSONArray;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying Datacite
@@ -39,13 +49,19 @@ import org.dspace.importer.external.service.components.QuerySource;
  *
  * optional Affiliation informations are not part of the API request.
  * https://support.datacite.org/docs/can-i-see-more-detailed-affiliation-information-in-the-rest-api
- * 
+ *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  * @author Florian Gantner (florian.gantner@uni-bamberg.de)
  *
  */
 public class DataCiteImportMetadataSourceServiceImpl
-    extends AbstractImportMetadataSourceService<String> implements QuerySource {
+        extends AbstractImportMetadataSourceService<String> implements QuerySource {
+    private final static Logger log = LogManager.getLogger();
+
+    @Autowired
+    private LiveImportClient liveImportClient;
+
+    private final int timeoutMs = 10000;
 
     private WebTarget webTarget;
 
@@ -56,78 +72,100 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Override
     public void init() throws Exception {
-        Client client = ClientBuilder.newClient();
-        webTarget = client.target("https://api.datacite.org/dois/");
+    }
+
+    public void setWebTarget(WebTarget webTarget) {
+        this.webTarget = webTarget;
     }
 
     @Override
     public ImportRecord getRecord(String recordId) throws MetadataSourceException {
-        List<ImportRecord> records = null;
+        List<ImportRecord> records = new ArrayList<>();
         String id = getID(recordId);
-        if (StringUtils.isNotBlank(id)) {
-            records = retry(new SearchByIdCallable(id));
-        } else {
-            records = retry(new SearchByIdCallable(recordId));
+        Map<String, Map<String, String>> params = new HashMap<>();
+        Map<String, String> uriParameters = new HashMap<>();
+        params.put("uriParameters", uriParameters);
+        if (StringUtils.isBlank(id)) {
+            id = recordId;
         }
+        uriParameters.put("query", id);
+        String response = liveImportClient.executeHttpGetRequest(timeoutMs, "https://api.datacite.org/dois", params);
+        String json = response;
+        records.add(transformSourceRecords(json));
+
         return records == null || records.isEmpty() ? null : records.get(0);
     }
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
+        List<ImportRecord> records = new ArrayList<>();
         String id = getID(query);
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new DoiCheckCallable(id));
+        Map<String, Map<String, String>> params = new HashMap<>();
+        Map<String, String> uriParameters = new HashMap<>();
+        params.put("uriParameters", uriParameters);
+        if (StringUtils.isBlank(id)) {
+            id = query;
         }
-        return retry(new CountByQueryCallable(query));
+        uriParameters.put("query", id);
+        String response = liveImportClient.executeHttpGetRequest(timeoutMs, "https://api.datacite.org/dois", params);
+        String json = response;
+        records.add(transformSourceRecords(json));
+
+        return records.size();
     }
 
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new DoiCheckCallable(id));
-        }
-        return retry(new CountByQueryCallable(query));
+        return getRecordsCount(StringUtils.isBlank(id) ? query.toString() : id);
     }
 
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
-        String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
+        List<ImportRecord> records = new ArrayList<>();
+        String id = getID(query);
+        Map<String, Map<String, String>> params = new HashMap<>();
+        Map<String, String> uriParameters = new HashMap<>();
+        params.put("uriParameters", uriParameters);
+        if (StringUtils.isBlank(id)) {
+            id = query;
         }
-        return retry(new SearchByQueryCallable(query, count, start));
+        uriParameters.put("query", id);
+        String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, "https://api.datacite.org/dois", params);
+        JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+        JsonNode attributesNode = jsonNode.at("/data/attributes");
+        String json = "";
+        records.add(transformSourceRecords(json));
+
+        return records;
+    }
+
+    private JsonNode convertStringJsonToJsonNode(String json) {
+        try {
+            return new ObjectMapper().readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error("Unable to process json response.", e);
+        }
+        return null;
     }
 
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
-        }
-        return retry(new SearchByQueryCallable(query));
+        return getRecords(StringUtils.isBlank(id) ? query.toString() : id, 0, -1);
     }
 
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = null;
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            records = retry(new SearchByIdCallable(id));
-        } else {
-            records = retry(new SearchByIdCallable(query));
-        }
-        return records == null || records.isEmpty() ? null : records.get(0);
+        return getRecord(StringUtils.isBlank(id) ? query.toString() : id);
     }
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         String id = getID(query.toString());
-        if (StringUtils.isNotBlank(id)) {
-            return retry(new SearchByIdCallable(id));
-        }
-        return retry(new FindMatchingRecordCallable(query));
+        return getRecords(StringUtils.isBlank(id) ? query.toString() : id, 0, -1);
     }
 
 
@@ -188,7 +226,7 @@ public class DataCiteImportMetadataSourceServiceImpl
                 ReadContext ctx = JsonPath.parse(responseString);
                 Object o = ctx.read("$.data.attributes");
                 if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                    JSONArray array = (JSONArray)o;
+                    JSONArray array = (JSONArray) o;
                     int size = array.size();
                     for (int index = 0; index < size; index++) {
                         Gson gson = new Gson();
@@ -237,7 +275,7 @@ public class DataCiteImportMetadataSourceServiceImpl
                 ReadContext ctx = JsonPath.parse(responseString);
                 Object o = ctx.read("$.data.attributes");
                 if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                    JSONArray array = (JSONArray)o;
+                    JSONArray array = (JSONArray) o;
                     int size = array.size();
                     for (int index = 0; index < size; index++) {
                         Gson gson = new Gson();
@@ -294,7 +332,7 @@ public class DataCiteImportMetadataSourceServiceImpl
                 ReadContext ctx = JsonPath.parse(responseString);
                 Object o = ctx.read("$.data.attributes");
                 if (o.getClass().isAssignableFrom(JSONArray.class)) {
-                    JSONArray array = (JSONArray)o;
+                    JSONArray array = (JSONArray) o;
                     int size = array.size();
                     for (int index = 0; index < size; index++) {
                         Gson gson = new Gson();

@@ -19,11 +19,17 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.el.MethodNotFoundException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -54,7 +60,7 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test.json")) {
-
+            when(ClientBuilder.newClient()).thenReturn((Client)httpClient);
             String dataCiteRespXmlResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -75,15 +81,22 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     public void dataCiteImportMetadataGetRecordsCountTest() throws Exception {
         context.turnOffAuthorisationSystem();
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
-        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        Client httpClient = Mockito.mock(Client.class);
+        WebTarget webTarget = Mockito.mock(WebTarget.class);
+        WebTarget webTarget2 = Mockito.mock(WebTarget.class);
+        Invocation.Builder invocationBuilder = Mockito.mock(Invocation.Builder.class);
+        Response response = Mockito.mock(Response.class);
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-test.json")) {
-            String dataCiteRespXmlResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
+            String dataCiteRespJsonResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
 
-            liveImportClientImpl.setHttpClient(httpClient);
-            CloseableHttpResponse response = mockResponse(dataCiteRespXmlResp, 200, "OK");
-            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+            when(httpClient.target(ArgumentMatchers.anyString())).thenReturn(webTarget);
+            when(webTarget.queryParam(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(webTarget2);
+            when(webTarget2.request()).thenReturn(invocationBuilder);
+            when(invocationBuilder.get()).thenReturn(response);
+            when(response.readEntity(String.class)).thenReturn(dataCiteRespJsonResp);
 
             context.restoreAuthSystemState();
+            dataCiteServiceImpl.setWebTarget(webTarget);
             int tot = dataCiteServiceImpl.getRecordsCount("test query");
             assertEquals(10, tot);
         } finally {
@@ -98,7 +111,6 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
 
         try (InputStream dataCiteResp = getClass().getResourceAsStream("dataCite-by-id.json")) {
-
             String dataCiteRespXmlResp = IOUtils.toString(dataCiteResp, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
